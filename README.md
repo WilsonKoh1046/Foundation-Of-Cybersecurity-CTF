@@ -1,3 +1,24 @@
+# Foundation-Of-Cybersecurity-CTF
+
+## Development
+Inside the root dir, follow the steps below:
+```
+yarn
+cd server/
+yarn
+yarn dev
+```
+Visit the app on http://localhost:3000/
+
+### Guest Login
+```
+Username: User 1
+Password: user1PW
+```
+
+(Currently we have 5 guest users, check /server/users.js)
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

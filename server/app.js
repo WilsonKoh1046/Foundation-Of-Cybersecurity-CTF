@@ -1,0 +1,35 @@
+const Express = require('express');
+const app = Express();
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const port = 5000;
+
+const db = require('./users');
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded( { extended: true }));
+
+app.use(cors());
+
+app.get('/', (req, res) => {
+    res.send('The server is alive');
+})
+
+app.post('/login', (req, res) => {
+    const { username, password } = req.body;
+    for (let user of db.users) {
+        if (user.username === username && user.password === password) {
+            res.status(200).json({"Message": "success", "Data": user});
+            return;
+        }
+    }
+    res.status(404).json({"Message": "user not found"});
+})
+
+app.post('/edit', (req, res) => {
+
+})
+
+app.listen(port, () => {
+    console.log(`The server is running on port ${port}`);
+})
