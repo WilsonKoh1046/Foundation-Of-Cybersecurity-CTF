@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router-dom';
 import { logout } from '../services/loginService';
-import { editProfile } from '../services/profileService';
+import { editUserProfile } from '../services/profileService';
 
 export default function Profile() {
     const { register, handleSubmit } = useForm();
@@ -27,8 +27,21 @@ export default function Profile() {
         }
     }
 
-    const onSubmit = (data) => {
-        console.log(data);
+    const onSubmit = async (data) => {
+        try {
+            const response = await editUserProfile(data);
+            if (response.status === 201) {
+                if (response.data.Message === "admin_granted") {
+                    console.log("here");
+                    localStorage.setItem("CTFAdminRole", "admin");
+                    alert("Something magical just happened");
+                    history.push('/login');
+                    history.go(0);
+                }
+            }
+        } catch(err) {
+            console.log(err);
+        }
     }
 
     const signOut = () => {

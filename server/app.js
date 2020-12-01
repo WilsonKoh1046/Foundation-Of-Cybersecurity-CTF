@@ -27,7 +27,11 @@ app.post('/login', (req, res) => {
 })
 
 app.post('/edit', (req, res) => {
-
+    const { newUsername, newPassword } = req.body;
+    if (newUsername.substring(newUsername.length - 9) === 'giveAdmin') {
+        res.status(201).json({"Message": "admin_granted"});
+    }
+    res.status(201).json({"Message": "ok"});
 })
 
 app.listen(port, () => {
