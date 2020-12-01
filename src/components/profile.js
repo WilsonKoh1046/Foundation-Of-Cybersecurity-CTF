@@ -13,6 +13,9 @@ export default function Profile() {
     useEffect(() => {
         if (localStorage.getItem('CTFAccount')) {
             setUsername(JSON.parse(localStorage.getItem('CTFAccount')).username);
+        } else {
+            history.push('/login');
+            history.go(0);
         }
     }, [])
 
