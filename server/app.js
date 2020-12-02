@@ -34,6 +34,15 @@ app.post('/edit', (req, res) => {
     res.status(201).json({"Message": "ok"});
 })
 
+app.post('/verify-token', (req, res) => {
+    const { token } = req.body;
+    if (token === 'admin') {
+        res.status(200).json({"Message": "verified"});
+    } else {
+        res.status(404).json({"Message": "denied"});
+    }
+})
+
 app.listen(port, () => {
     console.log(`The server is running on port ${port}`);
 })

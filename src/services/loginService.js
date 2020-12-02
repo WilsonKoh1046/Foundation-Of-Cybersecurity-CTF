@@ -16,3 +16,12 @@ export const logout = () => {
     }
     return false;
 }
+
+export const verifyToken = async (token) => {
+    try {
+        const response = await axios.post('/verify-token', {"token": token});
+        return response;
+    } catch(err) {
+        console.log(err);
+    }
+}

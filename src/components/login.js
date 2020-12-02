@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router-dom';
-import { login } from '../services/loginService';
+import { login, verifyToken } from '../services/loginService';
 
 export default function Login() {
     const { register, handleSubmit, errors } = useForm();
@@ -10,7 +10,16 @@ export default function Login() {
 
     useEffect(() => {
         if (localStorage.getItem("CTFAdminRole")) {
-            setIsAdmin(true);
+            (async () => {
+                try {
+                    const response = await verifyToken(localStorage.getItem("CTFAdminRole"));
+                    if (response.status === 200 && response.data.Message === "verified") {
+                        setIsAdmin(true);
+                    }
+                } catch(err) {
+                    console.log(err);
+                }
+            })();
         }
     }, []);
 

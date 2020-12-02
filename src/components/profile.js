@@ -13,6 +13,7 @@ export default function Profile() {
     useEffect(() => {
         if (localStorage.getItem('CTFAccount')) {
             setUsername(JSON.parse(localStorage.getItem('CTFAccount')).username);
+            console.log("Hint: You need to add something to the end of your username!");
         } else {
             history.push('/login');
             history.go(0);
@@ -37,8 +38,11 @@ export default function Profile() {
                     alert("Something magical just happened");
                     history.push('/login');
                     history.go(0);
+                } else {
+                    alert("Once a normal user always a normal user");
                 }
             }
+            setEditProfile(false);
         } catch(err) {
             console.log(err);
         }
