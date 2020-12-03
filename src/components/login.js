@@ -1,98 +1,71 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router-dom';
-import { login, verifyToken } from '../services/loginService';
+import { login } from '../services/loginService';
 
 export default function Login() {
     const { register, handleSubmit, errors } = useForm();
     const history = useHistory();
-    const [isAdmin, setIsAdmin] = useState(false);
 
     useEffect(() => {
-        if (localStorage.getItem("CTFAdminRole")) {
-            (async () => {
-                try {
-                    const response = await verifyToken(localStorage.getItem("CTFAdminRole"));
-                    if (response.status === 200 && response.data.Message === "verified") {
-                        setIsAdmin(true);
-                    }
-                } catch(err) {
-                    console.log(err);
-                }
-            })();
+        if (localStorage.getItem("CTFAccount") && JSON.parse(localStorage.getItem("CTFAccount")).role === "admin") {
+            history.push('/admin');
+        } else if (localStorage.getItem("CTFAccount")) {
+            history.push("/profile");
         }
     }, []);
 
     const onSubmit = async (data) => {
+        let groupNo = data.groupNumber;
+        data.groupNumber = parseInt(groupNo);
         try {
-            if (!isAdmin) {
-                const response = await login(data);
-                if (response.status === 200) {
-                    localStorage.setItem('CTFAccount', JSON.stringify(response.data.Data));
-                    alert(`${response.data.Message}`);
-                    history.push('/profile');
-                }
-            } else {
-                alert("success");
-                history.push('/admin');
+            const response = await login(data);
+            if (response.status === 200 && response.data.message === "proceed") {
+                localStorage.setItem("CTFAccount", JSON.stringify({ "groupNumber": `${data.groupNumber}`, "role": "user" }));
+                history.push('/profile');
+            } else if (response.status === 250) {
+                alert("Failed to login, please try again");
+                history.go(0);
             }
         } catch(err) {
             console.log(err);
-            alert("Failed to login");
-            history.go(0);
-            return;
         }
     }
 
     return (
         <div className="container-fluid">
-            { isAdmin ?
-                <>
-                <h1 className="text-light">Admin User Login</h1>
-                <form onSubmit={handleSubmit(onSubmit)}>
+            <h1 className="text-light">Normal User Login</h1>
+            <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="form-group">
-                    <label className="text-light">Username</label>
-                        <br/>
-                        <input name="username" ref={register({required: { value: true, message: "Must input username" }})} />
-                        {errors.username && errors.username.type === "required" && (
-                            <div className="error text-danger">{errors.username.message}</div>
-                        )}
-                    </div>
-                    <div className="form-group">
-                    <label className="text-light">Password</label>
+                    <label className="text-light">Group Number</label>
                     <br/>
-                    <input name="password" type="password" ref={register({required: { value: true, message: "Must input password" }})} />
-                    {errors.password && errors.password.type === "required" && (
-                    <div className="error text-danger">{errors.password.message}</div>
+                    <select name="groupNumber" ref={register({required: { value: true, message: "Must choose your group number" }})}>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                    </select>
+                    {errors.groupNumber && errors.groupNumber.type === "required" && (
+                        <div className="error text-danger">{errors.groupNumber.message}</div>
                     )}
                 </div>
-                <input className="btn btn-primary" type="submit" ref={register} value="Submit" />
-                </form>
-                </>
-                :
-                <>
-                <h1 className="text-light">Normal UserLogin</h1>
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <div className="form-group">
-                        <label className="text-light">Username</label>
-                        <br/>
-                        <input name="username" ref={register({required: { value: true, message: "Must input username" }})} />
-                        {errors.username && errors.username.type === "required" && (
-                            <div className="error text-danger">{errors.username.message}</div>
-                        )}
-                    </div>
-                    <div className="form-group">
-                        <label className="text-light">Password</label>
-                        <br/>
-                        <input name="password" type="password" ref={register({required: { value: true, message: "Must input password" }})} />
-                        {errors.password && errors.password.type === "required" && (
-                            <div className="error text-danger">{errors.password.message}</div>
-                        )}
-                    </div>
-                    <input className="btn btn-primary" type="submit" ref={register} value="Submit" />
-                </form>
-                </>
-            }
+                <div className="form-group">
+                    <label className="text-light">Password</label>
+                    <br/>
+                    <input name="loginPassword" type="password" ref={register({required: { value: true, message: "Must input password" }})} />
+                    {errors.loginPassword && errors.loginPassword.type === "required" && (
+                        <div className="error text-danger">{errors.loginPassword.message}</div>
+                    )}
+                </div>
+                <input className="btn btn-primary" name="submit" type="submit" ref={register} value="Submit" />
+            </form>
         </div>
     );
 }

@@ -7,13 +7,15 @@ import { editUserProfile } from '../services/profileService';
 export default function Profile() {
     const { register, handleSubmit } = useForm();
     const history = useHistory();
-    const [username, setUsername] = useState('stranger');
+    const [groupNumber, setGroupNumber] = useState(0);
     const [editProfile, setEditProfile] = useState(false);
 
     useEffect(() => {
+        if (localStorage.getItem("CTFAccount") && JSON.parse(localStorage.getItem("CTFAccount")).role === "admin") {
+            history.push('/admin');
+        } 
         if (localStorage.getItem('CTFAccount')) {
-            setUsername(JSON.parse(localStorage.getItem('CTFAccount')).username);
-            console.log("Hint: You need to add something to the end of your username!");
+            setGroupNumber(JSON.parse(localStorage.getItem('CTFAccount')).groupNumber);
         } else {
             history.push('/login');
             history.go(0);
@@ -29,20 +31,18 @@ export default function Profile() {
     }
 
     const onSubmit = async (data) => {
+        data.groupNumber = parseInt(groupNumber);
         try {
             const response = await editUserProfile(data);
-            if (response.status === 201) {
-                if (response.data.Message === "admin_granted") {
-                    console.log("here");
-                    localStorage.setItem("CTFAdminRole", "admin-as-JWT");
-                    alert("Something magical just happened");
-                    history.push('/login');
-                    history.go(0);
-                } else {
-                    alert("Once a normal user always a normal user");
-                }
+            if (response.status === 200 && response.data.message === "proceed") {
+                let currentAcc = JSON.parse(localStorage.getItem("CTFAccount"));
+                currentAcc.role = response.data.role;
+                localStorage.setItem("CTFAccount", JSON.stringify(currentAcc));
+                history.push('/admin');
+            } else {
+                alert("Wrong admin password, please try again");
+                console.log("This cipher looks useful....     " + response.data.cipher);
             }
-            setEditProfile(false);
         } catch(err) {
             console.log(err);
         }
@@ -56,21 +56,18 @@ export default function Profile() {
 
     return (
         <div className="container-fluid">
-            <h1 className="text-light">Hi, {username}</h1>
+            <h1 className="text-light">Hi, Group {groupNumber}</h1>
             <br/>
             <div>
                 { editProfile && (
                     <div className="container-fluid">
                         <form onSubmit={handleSubmit(onSubmit)}>
                             <div className="form-group">
-                                <label className="text-white">New Username</label>
+                                <label className="text-white">Please Enter the Admin Password</label>
                                 <br/>
-                                <input name="newUsername" defaultValue={username} ref={register} />
-                            </div>
-                            <div className="form-group">
-                                <label className="text-white">New Password</label>
+                                <input name="adminPassword" type="password" ref={register} />
                                 <br/>
-                                <input name="newPassword" type="password" ref={register} />
+                                <i className="text-danger">Hint: Remember what you typed here...</i>
                             </div>
                             <input type="submit" className="btn btn-primary" ref={register} />
                         </form>
