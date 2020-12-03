@@ -36,7 +36,7 @@ app.post('/edit', (req, res) => {
 
 app.post('/verify-token', (req, res) => {
     const { token } = req.body;
-    if (token === 'admin') {
+    if (token === 'admin-as-JWT') {
         res.status(200).json({"Message": "verified"});
     } else {
         res.status(404).json({"Message": "denied"});

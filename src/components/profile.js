@@ -34,7 +34,7 @@ export default function Profile() {
             if (response.status === 201) {
                 if (response.data.Message === "admin_granted") {
                     console.log("here");
-                    localStorage.setItem("CTFAdminRole", "admin");
+                    localStorage.setItem("CTFAdminRole", "admin-as-JWT");
                     alert("Something magical just happened");
                     history.push('/login');
                     history.go(0);

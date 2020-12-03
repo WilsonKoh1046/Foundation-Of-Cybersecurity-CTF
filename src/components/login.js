@@ -25,11 +25,16 @@ export default function Login() {
 
     const onSubmit = async (data) => {
         try {
-            const response = await login(data);
-            if (response.status === 200) {
-                localStorage.setItem('CTFAccount', JSON.stringify(response.data.Data));
-                alert(`${response.data.Message}`);
-                history.push('/profile');
+            if (!isAdmin) {
+                const response = await login(data);
+                if (response.status === 200) {
+                    localStorage.setItem('CTFAccount', JSON.stringify(response.data.Data));
+                    alert(`${response.data.Message}`);
+                    history.push('/profile');
+                }
+            } else {
+                alert("success");
+                history.push('/admin');
             }
         } catch(err) {
             console.log(err);
